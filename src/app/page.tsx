@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { getCharacters } from "@/app/lib/rickmorty"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export default async function Home({
   searchParams,
@@ -16,13 +18,13 @@ export default async function Home({
       <h1 className="text-3xl font-semibold">Rick & Morty Characters</h1>
 
       <form className="mt-4 flex gap-2">
-        <input
-          className="w-full rounded-md border px-3 py-2"
+        <Input
+          className="w-full"
           name="name"
           placeholder="Search by name…"
           defaultValue={name}
         />
-        <button className="rounded-md border px-3 py-2">Search</button>
+        <Button type="submit">Search</Button>
       </form>
 
       {data.results.length === 0 ? (

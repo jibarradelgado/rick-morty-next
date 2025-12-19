@@ -2,6 +2,7 @@
 
 import { useEffect } from "react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default function Error({
   error,
@@ -20,18 +21,14 @@ export default function Error({
         <h2 className="text-2xl font-semibold mb-4">Failed to load character</h2>
         <p className="text-gray-600 mb-6">{error.message || "An unexpected error occurred"}</p>
         <div className="flex gap-4">
-          <button
-            onClick={reset}
-            className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
-          >
+          <Button onClick={reset}>
             Try again
-          </button>
-          <Link
-            href="/"
-            className="rounded-md border px-4 py-2 hover:bg-gray-50 transition-colors"
-          >
-            Back to characters
-          </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/">
+              Back to characters
+            </Link>
+          </Button>
         </div>
       </div>
     </main>
