@@ -1,7 +1,7 @@
 import Link from "next/link"
+import { Suspense } from "react"
 import { getCharacters } from "@/app/lib/rickmorty"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { SearchForm } from "@/components/search-form"
 
 export default async function Home({
   searchParams,
@@ -17,15 +17,14 @@ export default async function Home({
     <main className="mx-auto max-w-5xl p-6">
       <h1 className="text-3xl font-semibold">Rick & Morty Characters</h1>
 
-      <form className="mt-4 flex gap-2">
-        <Input
-          className="w-full"
-          name="name"
-          placeholder="Search by name…"
-          defaultValue={name}
-        />
-        <Button type="submit">Search</Button>
-      </form>
+      <Suspense fallback={
+        <div className="mt-4 flex gap-2">
+          <div className="h-9 w-full rounded-md border bg-muted animate-pulse" />
+          <div className="h-9 w-20 rounded-md border bg-muted animate-pulse" />
+        </div>
+      }>
+        <SearchForm defaultValue={name} />
+      </Suspense>
 
       {data.results.length === 0 ? (
         <div className="mt-6 text-center py-12">
