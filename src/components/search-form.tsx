@@ -10,46 +10,71 @@ export function SearchForm({ defaultValue }: { defaultValue: string }) {
   const searchParams = useSearchParams()
   const [searchValue, setSearchValue] = useState(defaultValue)
   const isInitialMount = useRef(true)
+  const previousSearchValue = useRef(defaultValue)
+
+  // Sync local state when defaultValue prop changes (from URL changes via server component)
+  useEffect(() => {
+    if (defaultValue !== searchValue) {
+      setSearchValue(defaultValue)
+      previousSearchValue.current = defaultValue
+    }
+  }, [defaultValue])
 
   useEffect(() => {
     // Skip debounce on initial mount
     if (isInitialMount.current) {
       isInitialMount.current = false
+      previousSearchValue.current = searchValue
+      return
+    }
+
+    // Don't trigger if value hasn't actually changed
+    if (searchValue === previousSearchValue.current) {
       return
     }
 
     const timer = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString())
+      // Check if the value still differs from what's in the URL
+      const currentUrlName = searchParams.get("name") || ""
+      const trimmedValue = searchValue.trim()
+      
+      // Only update if the value is different from what's in the URL
+      if (trimmedValue !== currentUrlName) {
+        const params = new URLSearchParams(searchParams.toString())
 
-      if (searchValue.trim()) {
-        params.set("name", searchValue.trim())
-        params.set("page", "1") // Reset to page 1 when searching
-      } else {
-        params.delete("name")
-        // Keep current page if clearing search
-        if (!params.get("page")) {
-          params.set("page", "1")
+        if (trimmedValue) {
+          params.set("name", trimmedValue)
+          params.set("page", "1") // Reset to page 1 when searching
+        } else {
+          params.delete("name")
+          // Keep current page if clearing search
+          if (!params.get("page")) {
+            params.set("page", "1")
+          }
         }
-      }
 
-      router.push(`/?${params.toString()}`)
+        router.push(`/?${params.toString()}`)
+        previousSearchValue.current = trimmedValue
+      }
     }, 1000) // 1 second debounce
 
     return () => clearTimeout(timer)
-  }, [searchValue, router, searchParams])
+  }, [searchValue, router])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const trimmedValue = searchValue.trim()
     const params = new URLSearchParams(searchParams.toString())
 
-    if (searchValue.trim()) {
-      params.set("name", searchValue.trim())
+    if (trimmedValue) {
+      params.set("name", trimmedValue)
       params.set("page", "1")
     } else {
       params.delete("name")
     }
 
     router.push(`/?${params.toString()}`)
+    previousSearchValue.current = trimmedValue
   }
 
   return (
